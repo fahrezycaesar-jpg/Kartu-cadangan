@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Foto Abadi — Sniperan</title>
+  <style>
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    ::-webkit-scrollbar { display: none; }
+
+    html, body {
+      height: 100%;
+      background: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #111827;
+      overflow-x: hidden;
+    }
+
+    button { outline: none; border: none; }
+
+    .disclaimer {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      background-color: #fef2f2; color: #dc2626;
+      padding: 8px 16px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      border: 1px solid #fecaca; z-index: 9999;
+      white-space: nowrap; pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      letter-spacing: 0.3px;
+    }
+
+    #input-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 80px 24px 24px 24px;
+      transition: opacity 0.5s ease; position: relative; z-index: 10; background: #ffffff;
+    }
+    .input-title { font-size: 22px; font-weight: 700; margin-bottom: 24px; text-align: center; }
+    .input-group { display: flex; flex-direction: column; width: 100%; max-width: 320px; gap: 16px; }
+    .input-group input {
+      width: 100%; padding: 16px; font-size: 16px;
+      border: 2px solid #e5e7eb; border-radius: 12px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: #2563eb; }
+    .btn-simpan {
+      background: #2563eb; color: white; font-size: 16px; font-weight: 600;
+      padding: 16px; border: none; border-radius: 12px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-simpan:hover { background: #1d4ed8; }
+
+    #main-screen { display: none; opacity: 0; transition: opacity 0.8s ease; padding-bottom: 120px; }
+    .content-container {
+      width: 100%; max-width: 400px; margin: 0 auto;
+      padding: 80px 24px 20px 24px;
+      display: flex; flex-direction: column; gap: 40px;
+    }
+    .section { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .section h2 { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; color: #111827; }
+    .section p { font-size: 14px; line-height: 1.6; color: #4b5563; margin-bottom: 24px; }
+    .divider { width: 60px; height: 2px; background-color: #e5e7eb; border-radius: 2px; margin: 0 auto; }
+
+    .reason-list { display: flex; flex-direction: column; gap: 16px; width: 100%; text-align: left; }
+    .reason-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: #f9fafb; padding: 16px; border-radius: 12px; border: 1px solid #f3f4f6;
+    }
+    .reason-icon {
+      flex-shrink: 0; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center; color: #2563eb;
+    }
+    .reason-text { display: flex; flex-direction: column; gap: 4px; }
+    .reason-text strong { font-size: 14px; color: #111827; font-weight: 600; }
+    .reason-text span { font-size: 13px; color: #6b7280; line-height: 1.4; }
+
+    .btn-wrapper {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      display: flex; justify-content: center;
+      padding: 20px 24px 30px 24px;
+      background: linear-gradient(to top, #ffffff 60%, rgba(255,255,255,0));
+      z-index: 100;
+    }
+    .btn-ambil {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      background: #2563eb; color: #ffffff;
+      font-size: 16px; font-weight: 600; font-family: inherit;
+      width: 100%; max-width: 352px;
+      padding: 16px 32px; border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-ambil:active { transform: scale(0.98); background: #1d4ed8; }
+    .btn-ambil:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+    .btn-ambil svg { width: 20px; height: 20px; }
+
+    #camera-screen {
+      position: fixed; inset: 0;
+      background: #000;
+      z-index: 10000;
+      display: none;
+      overflow: hidden;
+    }
+    #camera-screen.active { display: block; }
+
+    #camera-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      background: #000;
+      z-index: 1;
+    }
+
+    .card-frame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      max-width: 320px;
+      aspect-ratio: 1 / 1.58;
+      border: 3px dashed #22c55e;
+      border-radius: 12px;
+      z-index: 5;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65); 
+      display: none;
+    }
+    
+    .card-frame::after {
+      content: "Posisikan Kartu di Sini";
+      position: absolute;
+      bottom: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #22c55e;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .camera-top-bar {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      display: flex; justify-content: space-between;
+      z-index: 10;
+    }
+    
+    .icon-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #flash-btn { display: none; }
+    #flash-btn svg { width: 24px; height: 24px; }
+    #flash-btn.active { color: #eab308; }
+    #flash-btn.active svg { fill: #eab308; }
+
+    .camera-bottom-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 30px 20px;
+      padding-bottom: max(30px, env(safe-area-inset-bottom));
+      display: flex; justify-content: center; align-items: center;
+      z-index: 10;
+    }
+    .shutter {
+      width: 74px; height: 74px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 5px solid rgba(255,255,255,0.4);
+      cursor: pointer;
+      box-shadow: 0 0 0 3px #fff inset;
+      transition: transform 0.1s, background-color 0.1s;
+    }
+    .shutter:active { transform: scale(0.92); background: #d1d5db; }
+
+    #preview-screen {
+      position: absolute; inset: 0;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      z-index: 20;
+    }
+    #preview-screen.active { display: flex; }
+
+    #preview-img {
+      flex: 1;
+      width: 100%;
+      object-fit: contain;
+      min-height: 0;
+      background: #000;
+    }
+
+    .preview-actions {
+      padding: 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      display: flex; gap: 12px; justify-content: center;
+      background: #000;
+    }
+    .preview-actions button {
+      flex: 1; max-width: 180px;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    #retake-btn { background: #374151; color: #fff; }
+    #download-btn { background: #2563eb; color: #fff; }
+
+    .toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: rgba(17,24,39,0.92); color: #fff;
+      padding: 10px 18px; border-radius: 10px;
+      font-size: 13px; z-index: 10001;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="disclaimer">Aplikasi / Website ini bukan resmi dari sekolah</div>
+
+  <div id="input-screen">
+    <div class="input-title">Siapa nama kamu, Sniperan?</div>
+    <div class="input-group">
+      <input type="text" id="name-input" placeholder="Masukkan nama lengkapmu..." autocomplete="off" />
+      <button class="btn-simpan" id="save-btn" type="button">Simpan Nama</button>
+    </div>
+  </div>
+
+  <div id="main-screen">
+    <div class="content-container">
+      <div class="section">
+        <h2 id="greet-title">Hai [Nama], siswa SMPN 04 JEMBER</h2>
+        <p>Aman kan kartu absensi kamu agar bisa jadi cadangan jika kartu:</p>
+        <div class="reason-list">
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div class="reason-text"><strong>Rusak</strong><span>tergores parah atau terbakar.</span></div>
+          </div>
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 11l-2 3 4 2-2 3"></path></svg>
+            </div>
+            <div class="reason-text"><strong>Sobek</strong><span>Kartu terbelah, terpotong.</span></div>
+          </div>
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <div class="reason-text"><strong>Hilang</strong><span>Kartu terjatuh, tertinggal, atau dicuri.</span></div>
+          </div>
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            </div>
+            <div class="reason-text"><strong>Tercuci</strong><span>Kartu ikut tercuci di mesin cuci atau terendam.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Hai Sniperan...!</h2>
+        <p>
+          <span id="dynamic-name-text" style="font-weight: 600; color: #111827;">[Nama]</span>
+          tidak perlu khawatir jika kartu kamu hilang atau sobek karena di sini ada kartu cadangan kamu... Kartu mu akan tersimpan permanen dan tidak dapat di hapus ini beda dari galeri karena:
+        </p>
+        <div class="reason-list">
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><rect x="9" y="11" width="6" height="5" rx="1"></rect><path d="M10 11V9a2 2 0 1 1 4 0v2"></path></svg>
+            </div>
+            <div class="reason-text"><strong>1. Tersimpan 100%</strong><span>Kartu cadangan mu tersimpan 100% di sini dan tidak ada orang lain yang dapat mengaksesnya termasuk developer.</span></div>
+          </div>
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </div>
+            <div class="reason-text"><strong>2. Bebas "Gak Sengaja Kehapus"</strong><span>Di sini tidak ada yang namanya "gak sengaja kehapus" karena Aplikasi ini selalu mengamankan foto kartu mu kapan pun.</span></div>
+          </div>
+          <div class="reason-item">
+            <div class="reason-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </div>
+            <div class="reason-text"><strong>3. Bisa Diunduh</strong><span>Bisa kamu unduh dengan format PDF, PNG, JPG untuk di print lagi.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-wrapper">
+      <button class="btn-ambil" id="btn-ambil" type="button" disabled aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        Ambil foto kartu kamu
+      </button>
+    </div>
+  </div>
+
+  <div id="camera-screen" aria-hidden="true">
+    <video id="camera-video" autoplay playsinline muted></video>
+    <canvas id="camera-canvas" hidden></canvas>
+
+    <div class="card-frame" id="card-frame"></div>
+
+    <div class="camera-top-bar">
+      <button id="flash-btn" class="icon-btn" type="button" aria-label="Flash">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </button>
+      <button id="close-camera" class="icon-btn" type="button" aria-label="Tutup kamera">✕</button>
+    </div>
+
+    <div class="camera-bottom-bar" id="shutter-bar">
+      <button class="shutter" id="capture-btn" type="button" aria-label="Ambil Foto"></button>
+    </div>
+
+    <div id="preview-screen">
+      <img id="preview-img" alt="Preview kartu" />
+      <div class="preview-actions">
+        <button id="retake-btn" type="button">Foto Ulang</button>
+        <button id="download-btn" type="button">Simpan / Unduh</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputScreen = document.getElementById("input-screen");
+      const mainScreen = document.getElementById("main-screen");
+      const nameInput = document.getElementById("name-input");
+      const saveBtn = document.getElementById("save-btn");
+      const greetTitle = document.getElementById("greet-title");
+      const dynamicNameText = document.getElementById("dynamic-name-text");
+      const btnAmbil = document.getElementById("btn-ambil");
+
+      const cameraScreen = document.getElementById("camera-screen");
+      const cameraVideo = document.getElementById("camera-video");
+      const canvas = document.getElementById("camera-canvas");
+      const closeCameraBtn = document.getElementById("close-camera");
+      const captureBtn = document.getElementById("capture-btn");
+      const shutterBar = document.getElementById("shutter-bar");
+      const previewScreen = document.getElementById("preview-screen");
+      const previewImg = document.getElementById("preview-img");
+      const retakeBtn = document.getElementById("retake-btn");
+      const downloadBtn = document.getElementById("download-btn");
+      const toast = document.getElementById("toast");
+      const cardFrame = document.getElementById("card-frame");
+      const flashBtn = document.getElementById("flash-btn");
+
+      let stream = null;
+      let videoTrack = null;
+      let isFlashOn = false;
+
+      function showToast(msg, duration = 2500) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => toast.classList.remove("show"), duration);
+      }
+
+      const savedName = localStorage.getItem("sniperName");
+      if (savedName) {
+        showMainScreen(savedName, false);
+      } else {
+        inputScreen.style.display = "flex";
+        mainScreen.style.display = "none";
+      }
+
+      saveBtn.addEventListener("click", () => {
+        const name = nameInput.value.trim();
+        if (name) {
+          localStorage.setItem("sniperName", name);
+          showMainScreen(name, true);
+        } else {
+          alert("Tolong masukkan nama kamu dulu ya!");
+        }
+      });
+
+      function showMainScreen(name, animate) {
+        greetTitle.textContent = `Hai ${name}, siswa SMPN 04 JEMBER`;
+        dynamicNameText.textContent = name;
+
+        btnAmbil.disabled = false;
+        btnAmbil.removeAttribute("aria-disabled");
+
+        if (animate) {
+          inputScreen.style.opacity = "0";
+          setTimeout(() => {
+            inputScreen.style.display = "none";
+            mainScreen.style.display = "block";
+            void mainScreen.offsetWidth;
+            mainScreen.style.opacity = "1";
+          }, 500);
+        } else {
+          inputScreen.style.display = "none";
+          mainScreen.style.display = "block";
+          mainScreen.style.opacity = "1";
+        }
+      }
+
+      async function openCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showToast("Browser tidak mendukung kamera atau situs tidak aman (HTTPS).", 4000);
+          return;
+        }
+
+        cameraScreen.classList.add("active");
+        document.body.style.overflow = "hidden";
+        previewScreen.classList.remove("active");
+        
+        cameraVideo.style.display = "block"; 
+        shutterBar.style.display = "flex";
+        cardFrame.style.display = "none"; 
+        
+        isFlashOn = false;
+        flashBtn.classList.remove("active");
+        flashBtn.style.display = "none";
+
+        try {
+          // PERBAIKAN: Memaksa kamera belakang (environment) dengan resolusi yang aman
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { 
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            },
+            audio: false
+          });
+
+          cameraVideo.srcObject = stream;
+          
+          videoTrack = stream.getVideoTracks()[0];
+          
+          if (videoTrack) {
+            const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
+            if (capabilities.torch) {
+              flashBtn.style.display = "flex";
+            }
+          }
+
+          cameraVideo.onloadeddata = () => {
+            cameraVideo.play()
+              .then(() => {
+                cardFrame.style.display = "block";
+              })
+              .catch(err => {
+                console.error("Play error:", err);
+                showToast("Gagal memutar video kamera.", 3000);
+              });
+          };
+
+        } catch (err) {
+          console.error("Camera Error:", err);
+          showToast("Gagal mengakses kamera. Pastikan izin diberikan.", 4000);
+          closeCamera();
+        }
+      }
+
+      flashBtn.addEventListener("click", async () => {
+        if (!videoTrack) return;
+        try {
+          isFlashOn = !isFlashOn;
+          await videoTrack.applyConstraints({
+            advanced: [{ torch: isFlashOn }]
+          });
+
+          if (isFlashOn) {
+            flashBtn.classList.add("active");
+          } else {
+            flashBtn.classList.remove("active");
+          }
+        } catch (err) {
+          console.error("Flash Error:", err);
+          showToast("Gagal mengubah mode flash");
+          isFlashOn = !isFlashOn;
+        }
+      });
+
+      function stopStream() {
+        if (stream) {
+          stream.getTracks().forEach(t => t.stop());
+          stream = null;
+        }
+        videoTrack = null;
+        cameraVideo.srcObject = null;
+      }
+
+      function closeCamera() {
+        stopStream();
+        cameraScreen.classList.remove("active");
+        cameraScreen.setAttribute("aria-hidden", "true");
+        previewScreen.classList.remove("active");
+        cardFrame.style.display = "none";
+        
+        isFlashOn = false;
+        flashBtn.classList.remove("active");
+        flashBtn.style.display = "none";
+        
+        document.body.style.overflow = "";
+      }
+
+      captureBtn.addEventListener("click", () => {
+        const videoW = cameraVideo.videoWidth;
+        const videoH = cameraVideo.videoHeight;
+        
+        if (!videoW || !videoH) {
+          showToast("Kamera belum siap, coba lagi...");
+          return;
+        }
+
+        const rect = cameraVideo.getBoundingClientRect();
+        const containerW = rect.width;
+        const containerH = rect.height;
+
+        const scale = Math.max(containerW / videoW, containerH / videoH);
+        const renderedW = videoW * scale;
+        const renderedH = videoH * scale;
+        const offsetX = (renderedW - containerW) / 2;
+        const offsetY = (renderedH - containerH) / 2;
+
+        const frameRect = cardFrame.getBoundingClientRect();
+        
+        const videoPixelX = (frameRect.left + offsetX) / scale;
+        const videoPixelY = (frameRect.top + offsetY) / scale;
+        const videoPixelW = frameRect.width / scale;
+        const videoPixelH = frameRect.height / scale;
+
+        canvas.width = videoPixelW;
+        canvas.height = videoPixelH;
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(
+          cameraVideo, 
+          videoPixelX, videoPixelY, videoPixelW, videoPixelH,
+          0, 0, videoPixelW, videoPixelH
+        );
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+        previewImg.src = dataUrl;
+
+        previewScreen.classList.add("active");
+        cameraVideo.style.display = "none";
+        shutterBar.style.display = "none";
+        cardFrame.style.display = "none"; 
+      });
+
+      retakeBtn.addEventListener("click", () => {
+        previewScreen.classList.remove("active");
+        previewImg.src = "";
+        cameraVideo.style.display = "block";
+        shutterBar.style.display = "flex";
+        cardFrame.style.display = "block";
+      });
+
+      downloadBtn.addEventListener("click", () => {
+        if (!previewImg.src) return;
+        const name = localStorage.getItem("sniperName") || "kartu";
+        const safeName = name.replace(/[^a-zA-Z0-9]/g, "_");
+        const a = document.createElement("a");
+        a.href = previewImg.src;
+        a.download = `kartu_${safeName}_${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Foto berhasil diunduh");
+      });
+
+      closeCameraBtn.addEventListener("click", closeCamera);
+      btnAmbil.addEventListener("click", openCamera);
+      window.addEventListener("pagehide", stopStream);
+    });
+  </script>
+</body>
+</html>
