@@ -132,19 +132,30 @@
       box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65); 
       display: none;
     }
-    
-    .card-frame::after {
-      content: "Posisikan Kartu di Sini";
+
+    /* Area Teks Panduan di bawah bingkai */
+    .guidance-container {
       position: absolute;
-      bottom: -35px;
+      bottom: -50px; /* Di bawah bingkai */
       left: 50%;
       transform: translateX(-50%);
+      width: 100%;
+      text-align: center;
+    }
+
+    .guidance-text {
       color: #22c55e;
       font-size: 14px;
       font-weight: 600;
       white-space: nowrap;
       letter-spacing: 0.5px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    .guidance-text.error {
+      color: #ef4444; /* Merah jika error/gelap */
+      transform: scale(1.05);
     }
 
     .camera-top-bar {
@@ -328,8 +339,14 @@
   <div id="camera-screen" aria-hidden="true">
     <video id="camera-video" autoplay playsinline muted></video>
     <canvas id="camera-canvas" hidden></canvas>
+    <!-- Canvas kecil untuk analisis kecerahan & getaran -->
+    <canvas id="analysis-canvas" width="64" height="64" style="display:none;"></canvas>
 
-    <div class="card-frame" id="card-frame"></div>
+    <div class="card-frame" id="card-frame">
+      <div class="guidance-container">
+        <div class="guidance-text" id="guidance-text">Arahkan kartu ke kotak</div>
+      </div>
+    </div>
 
     <div class="camera-top-bar">
       <button id="flash-btn" class="icon-btn" type="button" aria-label="Flash">
@@ -368,6 +385,7 @@
       const cameraScreen = document.getElementById("camera-screen");
       const cameraVideo = document.getElementById("camera-video");
       const canvas = document.getElementById("camera-canvas");
+      const analysisCanvas = document.getElementById("analysis-canvas");
       const closeCameraBtn = document.getElementById("close-camera");
       const captureBtn = document.getElementById("capture-btn");
       const shutterBar = document.getElementById("shutter-bar");
@@ -378,10 +396,15 @@
       const toast = document.getElementById("toast");
       const cardFrame = document.getElementById("card-frame");
       const flashBtn = document.getElementById("flash-btn");
+      const guidanceText = document.getElementById("guidance-text");
 
       let stream = null;
       let videoTrack = null;
       let isFlashOn = false;
+      
+      // Variabel untuk Smart Guidance
+      let guidanceInterval = null;
+      let previousFrameData = null;
 
       function showToast(msg, duration = 2500) {
         toast.textContent = msg;
@@ -430,6 +453,62 @@
         }
       }
 
+      /* =====================================================
+         SMART GUIDANCE (Deteksi Cahaya & Getaran)
+         ===================================================== */
+      function startGuidance() {
+        const ctx = analysisCanvas.getContext("2d", { willReadFrequently: true });
+        
+        guidanceInterval = setInterval(() => {
+          if (!cameraVideo.videoWidth || cameraVideo.paused || cameraVideo.ended) return;
+          
+          // Gambar frame video ke canvas kecil (64x64) agar ringan diproses
+          ctx.drawImage(cameraVideo, 0, 0, 64, 64);
+          const imageData = ctx.getImageData(0, 0, 64, 64);
+          const data = imageData.data;
+
+          // 1. Hitung Kecerahan (Brightness)
+          let totalLuminance = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            // Rumus standar luminance: 0.299*R + 0.587*G + 0.114*B
+            totalLuminance += (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+          }
+          const avgLuminance = totalLuminance / (data.length / 4);
+
+          // 2. Hitung Getaran (Motion Detection)
+          let motion = 0;
+          if (previousFrameData) {
+            for (let i = 0; i < data.length; i += 4) {
+              motion += Math.abs(data[i] - previousFrameData[i]);
+            }
+            motion = motion / (data.length / 4);
+          }
+          previousFrameData = data.slice(); // Simpan frame ini untuk pengecekan selanjutnya
+
+          // --- Logika Feedback UI ---
+          // Batas toleransi: Terlalu gelap (< 40), Terlalu goyang (> 20)
+          if (avgLuminance < 40) {
+            guidanceText.textContent = "Cahaya kurang terang";
+            guidanceText.classList.add("error");
+          } else if (motion > 25) {
+            guidanceText.textContent = "Tahan HP agar tidak blur";
+            guidanceText.classList.add("error");
+          } else {
+            guidanceText.textContent = "Siap! Tekan tombol putih";
+            guidanceText.classList.remove("error");
+          }
+
+        }, 400); // Cek setiap 0.4 detik agar tidak membebani HP
+      }
+
+      function stopGuidance() {
+        clearInterval(guidanceInterval);
+        previousFrameData = null;
+      }
+
+      /* =====================================================
+         KAMERA
+         ===================================================== */
       async function openCamera() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           showToast("Browser tidak mendukung kamera atau situs tidak aman (HTTPS).", 4000);
@@ -449,7 +528,6 @@
         flashBtn.style.display = "none";
 
         try {
-          // PERBAIKAN: Memaksa kamera belakang (environment) dengan resolusi yang aman
           stream = await navigator.mediaDevices.getUserMedia({
             video: { 
               facingMode: "environment",
@@ -460,7 +538,6 @@
           });
 
           cameraVideo.srcObject = stream;
-          
           videoTrack = stream.getVideoTracks()[0];
           
           if (videoTrack) {
@@ -474,6 +551,7 @@
             cameraVideo.play()
               .then(() => {
                 cardFrame.style.display = "block";
+                startGuidance(); // Mulai analisis setelah video jalan
               })
               .catch(err => {
                 console.error("Play error:", err);
@@ -519,6 +597,7 @@
 
       function closeCamera() {
         stopStream();
+        stopGuidance(); // Hentikan analisis
         cameraScreen.classList.remove("active");
         cameraScreen.setAttribute("aria-hidden", "true");
         previewScreen.classList.remove("active");
@@ -574,6 +653,7 @@
         cameraVideo.style.display = "none";
         shutterBar.style.display = "none";
         cardFrame.style.display = "none"; 
+        stopGuidance(); // Berhenti analisis saat masuk pratinjau
       });
 
       retakeBtn.addEventListener("click", () => {
@@ -582,6 +662,7 @@
         cameraVideo.style.display = "block";
         shutterBar.style.display = "flex";
         cardFrame.style.display = "block";
+        startGuidance(); // Mulai lagi saat foto ulang
       });
 
       downloadBtn.addEventListener("click", () => {
