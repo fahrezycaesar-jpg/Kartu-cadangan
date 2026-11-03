@@ -22,7 +22,7 @@
       overflow-x: hidden;
     }
 
-    button { outline: none; border: none; }
+    button { outline: none; border: none; font-family: inherit; }
 
     .disclaimer {
       position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
@@ -36,7 +36,7 @@
     }
 
     #input-screen {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 80px 24px 24px 24px;
       transition: opacity 0.5s ease; position: relative; z-index: 10; background: #ffffff;
     }
@@ -100,6 +100,209 @@
     .btn-ambil:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
     .btn-ambil svg { width: 20px; height: 20px; }
 
+    /* ===== SAVED SCREEN (BARU) ===== */
+    #saved-screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 80px 24px 40px;
+      background: #ffffff;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: relative;
+      z-index: 10;
+    }
+    #saved-screen.active {
+      display: flex;
+      opacity: 1;
+    }
+    .saved-container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .saved-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #111827;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+    .saved-title .highlight {
+      color: #22c55e;
+    }
+    .saved-photo-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: 28px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      border: 3px solid #22c55e;
+      background: #fff;
+    }
+    .saved-photo {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .saved-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #22c55e;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(34,197,94,0.35);
+      letter-spacing: 0.3px;
+    }
+    .saved-badge svg { width: 12px; height: 12px; }
+
+    .btn-guru {
+      width: 100%;
+      max-width: 352px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #d1d5db;
+      color: #6b7280;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: not-allowed;
+      opacity: 0.7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid #e5e7eb;
+      pointer-events: none;
+    }
+    .btn-guru svg { width: 20px; height: 20px; }
+
+    .saved-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #9ca3af;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+
+    /* ===== TUTORIAL SCREEN ===== */
+    #tutorial-screen {
+      position: fixed; inset: 0;
+      background: #ffffff;
+      z-index: 9000;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #tutorial-screen.active { display: flex; opacity: 1; }
+    
+    .tutorial-content {
+      flex: 1;
+      padding: 80px 24px 100px 24px;
+      max-width: 400px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+    }
+    
+    .tutorial-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .tutorial-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .tutorial-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tutorial-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .tutorial-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      background: #dbeafe;
+      color: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tutorial-icon svg { width: 24px; height: 24px; }
+
+    .tutorial-text {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 4px;
+    }
+
+    .tutorial-text h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .tutorial-text p {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .btn-tutorial-wrapper {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      padding: 20px 24px 30px 24px;
+      background: linear-gradient(to top, #ffffff 70%, rgba(255,255,255,0));
+      display: flex; justify-content: center;
+    }
+
+    .btn-lanjutkan {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      background: #22c55e; color: #ffffff;
+      font-size: 16px; font-weight: 600; font-family: inherit;
+      width: 100%; max-width: 352px;
+      padding: 16px 32px; border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-lanjutkan:active { transform: scale(0.98); background: #16a34a; }
+
+    /* ===== CAMERA SCREEN ===== */
     #camera-screen {
       position: fixed; inset: 0;
       background: #000;
@@ -133,10 +336,9 @@
       display: none;
     }
 
-    /* Area Teks Panduan di bawah bingkai */
     .guidance-container {
       position: absolute;
-      bottom: -50px; /* Di bawah bingkai */
+      bottom: -50px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -154,7 +356,7 @@
     }
 
     .guidance-text.error {
-      color: #ef4444; /* Merah jika error/gelap */
+      color: #ef4444;
       transform: scale(1.05);
     }
 
@@ -235,7 +437,8 @@
       cursor: pointer;
     }
     #retake-btn { background: #374151; color: #fff; }
-    #download-btn { background: #2563eb; color: #fff; }
+    #download-btn { background: #22c55e; color: #fff; }
+    #download-btn:disabled { opacity: 0.6; cursor: wait; }
 
     .toast {
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
@@ -336,10 +539,95 @@
     </div>
   </div>
 
+  <!-- ================= SAVED SCREEN (BARU) ================= -->
+  <div id="saved-screen">
+    <div class="saved-container">
+      <h2 class="saved-title" id="saved-title"></h2>
+      <div class="saved-photo-wrap">
+        <img class="saved-photo" id="saved-photo" alt="Kartu absensi kamu" />
+        <div class="saved-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Tersimpan
+        </div>
+      </div>
+      <button class="btn-guru" type="button" disabled aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        Tunjukan ke guru
+      </button>
+      <p class="saved-note">Foto kartu ini tersimpan permanen dan tidak dapat dihapus.</p>
+    </div>
+  </div>
+
+  <!-- ================= TUTORIAL SCREEN ================= -->
+  <div id="tutorial-screen">
+    <div class="tutorial-content">
+      <h2 class="tutorial-title">Panduan Foto Kartu</h2>
+      <p class="tutorial-subtitle">Ikuti 3 langkah ini agar hasil foto tajam dan QR Code terbaca</p>
+      
+      <div class="tutorial-list">
+        <div class="tutorial-item">
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="12" y1="2" x2="12" y2="5"></line>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+              <line x1="2" y1="12" x2="5" y2="12"></line>
+              <line x1="19" y1="12" x2="22" y2="12"></line>
+            </svg>
+          </div>
+          <div class="tutorial-text">
+            <h3>Jangan Goyang & Sesuaikan Bingkai</h3>
+            <p>Tahan HP dengan stabil dan paskan kartu di dalam bingkai hijau sebagai batas aman.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-item">
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="tutorial-text">
+            <h3>Gunakan Flash</h3>
+            <p>Sangat disarankan menyalakan flash (ikon petir) agar hasil gambar tidak gelap dan lebih jernih.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-item">
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h0"></path>
+              <path d="M7 11h0"></path>
+              <path d="M11 15h6"></path>
+              <path d="M11 11h6"></path>
+            </svg>
+          </div>
+          <div class="tutorial-text">
+            <h3>Lepas Sampul ID Card</h3>
+            <p>Buka sampul plastik dan hanya sisakan kartunya. Sampul plastik memantulkan cahaya yang membuat QR Code buram.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-tutorial-wrapper">
+      <button class="btn-lanjutkan" id="btn-lanjutkan" type="button">
+        Lanjutkan ke Kamera
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= CAMERA SCREEN ================= -->
   <div id="camera-screen" aria-hidden="true">
     <video id="camera-video" autoplay playsinline muted></video>
     <canvas id="camera-canvas" hidden></canvas>
-    <!-- Canvas kecil untuk analisis kecerahan & getaran -->
     <canvas id="analysis-canvas" width="64" height="64" style="display:none;"></canvas>
 
     <div class="card-frame" id="card-frame">
@@ -365,7 +653,7 @@
       <img id="preview-img" alt="Preview kartu" />
       <div class="preview-actions">
         <button id="retake-btn" type="button">Foto Ulang</button>
-        <button id="download-btn" type="button">Simpan / Unduh</button>
+        <button id="download-btn" type="button">Simpan</button>
       </div>
     </div>
   </div>
@@ -374,13 +662,20 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      /* ========== ELEMENT REFS ========== */
       const inputScreen = document.getElementById("input-screen");
       const mainScreen = document.getElementById("main-screen");
+      const savedScreen = document.getElementById("saved-screen");
+      const savedTitle = document.getElementById("saved-title");
+      const savedPhotoEl = document.getElementById("saved-photo");
       const nameInput = document.getElementById("name-input");
       const saveBtn = document.getElementById("save-btn");
       const greetTitle = document.getElementById("greet-title");
       const dynamicNameText = document.getElementById("dynamic-name-text");
       const btnAmbil = document.getElementById("btn-ambil");
+
+      const tutorialScreen = document.getElementById("tutorial-screen");
+      const btnLanjutkan = document.getElementById("btn-lanjutkan");
 
       const cameraScreen = document.getElementById("camera-screen");
       const cameraVideo = document.getElementById("camera-video");
@@ -398,14 +693,18 @@
       const flashBtn = document.getElementById("flash-btn");
       const guidanceText = document.getElementById("guidance-text");
 
+      /* ========== STATE ========== */
+      const STORAGE_KEY_PHOTO = "sniperCardPhoto";
+      const STORAGE_KEY_NAME = "sniperName";
+
       let stream = null;
       let videoTrack = null;
-      let isFlashOn = false;
-      
-      // Variabel untuk Smart Guidance
+      let isFlashOn = false; 
+      let wasFlashOnBeforeCapture = false;
       let guidanceInterval = null;
       let previousFrameData = null;
 
+      /* ========== HELPERS ========== */
       function showToast(msg, duration = 2500) {
         toast.textContent = msg;
         toast.classList.add("show");
@@ -413,18 +712,25 @@
         showToast._t = setTimeout(() => toast.classList.remove("show"), duration);
       }
 
-      const savedName = localStorage.getItem("sniperName");
-      if (savedName) {
-        showMainScreen(savedName, false);
+      /* ========== INIT: CEK FOTO TERSIMPAN DULU ========== */
+      const savedPhotoData = localStorage.getItem(STORAGE_KEY_PHOTO);
+      const savedNameData = localStorage.getItem(STORAGE_KEY_NAME);
+
+      if (savedPhotoData && savedNameData) {
+        // Sudah pernah simpan foto -> langsung tampilkan halaman foto permanen
+        showSavedScreen(savedNameData, savedPhotoData);
+      } else if (savedNameData) {
+        showMainScreen(savedNameData, false);
       } else {
         inputScreen.style.display = "flex";
         mainScreen.style.display = "none";
       }
 
+      /* ========== SIMPAN NAMA ========== */
       saveBtn.addEventListener("click", () => {
         const name = nameInput.value.trim();
         if (name) {
-          localStorage.setItem("sniperName", name);
+          localStorage.setItem(STORAGE_KEY_NAME, name);
           showMainScreen(name, true);
         } else {
           alert("Tolong masukkan nama kamu dulu ya!");
@@ -453,29 +759,53 @@
         }
       }
 
-      /* =====================================================
-         SMART GUIDANCE (Deteksi Cahaya & Getaran)
-         ===================================================== */
+      /* ========== TAMPILKAN HALAMAN FOTO PERMANEN ========== */
+      function showSavedScreen(name, photoSrc) {
+        savedTitle.innerHTML = `<span class="highlight">${escapeHtml(name)}</span> ini foto kartu absensi kamu yang kita jaga sepanjang waktu`;
+        savedPhotoEl.src = photoSrc;
+
+        // Sembunyikan semua halaman lain
+        inputScreen.style.display = "none";
+        inputScreen.style.opacity = "0";
+        mainScreen.style.display = "none";
+        mainScreen.style.opacity = "0";
+        tutorialScreen.classList.remove("active");
+        previewScreen.classList.remove("active");
+        cameraScreen.classList.remove("active");
+        cameraScreen.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+
+        // Matikan kamera kalau masih nyala
+        try { stopStream(); } catch(e) {}
+        try { stopGuidance(); } catch(e) {}
+
+        // Tampilkan halaman foto
+        savedScreen.classList.add("active");
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, m => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[m]);
+      }
+
+      /* ========== GUIDANCE (DETEKSI CAHAYA & GUNCANGAN) ========== */
       function startGuidance() {
         const ctx = analysisCanvas.getContext("2d", { willReadFrequently: true });
         
         guidanceInterval = setInterval(() => {
           if (!cameraVideo.videoWidth || cameraVideo.paused || cameraVideo.ended) return;
           
-          // Gambar frame video ke canvas kecil (64x64) agar ringan diproses
           ctx.drawImage(cameraVideo, 0, 0, 64, 64);
           const imageData = ctx.getImageData(0, 0, 64, 64);
           const data = imageData.data;
 
-          // 1. Hitung Kecerahan (Brightness)
           let totalLuminance = 0;
           for (let i = 0; i < data.length; i += 4) {
-            // Rumus standar luminance: 0.299*R + 0.587*G + 0.114*B
             totalLuminance += (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
           }
           const avgLuminance = totalLuminance / (data.length / 4);
 
-          // 2. Hitung Getaran (Motion Detection)
           let motion = 0;
           if (previousFrameData) {
             for (let i = 0; i < data.length; i += 4) {
@@ -483,10 +813,8 @@
             }
             motion = motion / (data.length / 4);
           }
-          previousFrameData = data.slice(); // Simpan frame ini untuk pengecekan selanjutnya
+          previousFrameData = data.slice(); 
 
-          // --- Logika Feedback UI ---
-          // Batas toleransi: Terlalu gelap (< 40), Terlalu goyang (> 20)
           if (avgLuminance < 40) {
             guidanceText.textContent = "Cahaya kurang terang";
             guidanceText.classList.add("error");
@@ -498,7 +826,7 @@
             guidanceText.classList.remove("error");
           }
 
-        }, 400); // Cek setiap 0.4 detik agar tidak membebani HP
+        }, 400); 
       }
 
       function stopGuidance() {
@@ -506,9 +834,17 @@
         previousFrameData = null;
       }
 
-      /* =====================================================
-         KAMERA
-         ===================================================== */
+      /* ========== ALUR: BUKA TUTORIAL -> KAMERA ========== */
+      btnAmbil.addEventListener("click", () => {
+        tutorialScreen.classList.add("active");
+        document.body.style.overflow = "hidden";
+      });
+
+      btnLanjutkan.addEventListener("click", () => {
+        tutorialScreen.classList.remove("active");
+        openCamera();
+      });
+
       async function openCamera() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           showToast("Browser tidak mendukung kamera atau situs tidak aman (HTTPS).", 4000);
@@ -516,7 +852,6 @@
         }
 
         cameraScreen.classList.add("active");
-        document.body.style.overflow = "hidden";
         previewScreen.classList.remove("active");
         
         cameraVideo.style.display = "block"; 
@@ -524,6 +859,7 @@
         cardFrame.style.display = "none"; 
         
         isFlashOn = false;
+        wasFlashOnBeforeCapture = false;
         flashBtn.classList.remove("active");
         flashBtn.style.display = "none";
 
@@ -551,7 +887,7 @@
             cameraVideo.play()
               .then(() => {
                 cardFrame.style.display = "block";
-                startGuidance(); // Mulai analisis setelah video jalan
+                startGuidance(); 
               })
               .catch(err => {
                 console.error("Play error:", err);
@@ -566,6 +902,7 @@
         }
       }
 
+      /* ========== FLASH ========== */
       flashBtn.addEventListener("click", async () => {
         if (!videoTrack) return;
         try {
@@ -597,20 +934,22 @@
 
       function closeCamera() {
         stopStream();
-        stopGuidance(); // Hentikan analisis
+        stopGuidance();
         cameraScreen.classList.remove("active");
         cameraScreen.setAttribute("aria-hidden", "true");
         previewScreen.classList.remove("active");
         cardFrame.style.display = "none";
         
         isFlashOn = false;
+        wasFlashOnBeforeCapture = false;
         flashBtn.classList.remove("active");
         flashBtn.style.display = "none";
         
         document.body.style.overflow = "";
       }
 
-      captureBtn.addEventListener("click", () => {
+      /* ========== CAPTURE ========== */
+      captureBtn.addEventListener("click", async () => {
         const videoW = cameraVideo.videoWidth;
         const videoH = cameraVideo.videoHeight;
         
@@ -653,33 +992,102 @@
         cameraVideo.style.display = "none";
         shutterBar.style.display = "none";
         cardFrame.style.display = "none"; 
-        stopGuidance(); // Berhenti analisis saat masuk pratinjau
+        stopGuidance();
+
+        wasFlashOnBeforeCapture = isFlashOn;
+        if (isFlashOn && videoTrack) {
+          try {
+            await videoTrack.applyConstraints({ advanced: [{ torch: false }] });
+            flashBtn.classList.remove("active");
+            isFlashOn = false;
+          } catch (err) {
+            console.error("Gagal mematikan flash:", err);
+          }
+        }
       });
 
-      retakeBtn.addEventListener("click", () => {
+      /* ========== RETAKE ========== */
+      retakeBtn.addEventListener("click", async () => {
         previewScreen.classList.remove("active");
         previewImg.src = "";
         cameraVideo.style.display = "block";
         shutterBar.style.display = "flex";
         cardFrame.style.display = "block";
-        startGuidance(); // Mulai lagi saat foto ulang
+        startGuidance(); 
+
+        if (wasFlashOnBeforeCapture && videoTrack) {
+          try {
+            await videoTrack.applyConstraints({ advanced: [{ torch: true }] });
+            flashBtn.classList.add("active");
+            isFlashOn = true;
+          } catch (err) {
+            console.error("Gagal menyalakan flash kembali:", err);
+          }
+        }
+        wasFlashOnBeforeCapture = false; 
       });
 
-      downloadBtn.addEventListener("click", () => {
+      /* ========== SIMPAN FOTO (PERMANEN) ========== */
+      downloadBtn.addEventListener("click", async () => {
         if (!previewImg.src) return;
-        const name = localStorage.getItem("sniperName") || "kartu";
-        const safeName = name.replace(/[^a-zA-Z0-9]/g, "_");
-        const a = document.createElement("a");
-        a.href = previewImg.src;
-        a.download = `kartu_${safeName}_${Date.now()}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast("Foto berhasil diunduh");
+        const name = localStorage.getItem(STORAGE_KEY_NAME) || "Sniperan";
+        
+        downloadBtn.disabled = true;
+        const originalLabel = downloadBtn.textContent;
+        downloadBtn.textContent = "Menyimpan...";
+        
+        try {
+          // Coba simpan langsung (biasanya muat untuk gambar kartu)
+          localStorage.setItem(STORAGE_KEY_PHOTO, previewImg.src);
+        } catch (err) {
+          console.warn("Direct save failed, trying compression...", err);
+          // Kalau quota penuh, coba compress lebih kecil
+          try {
+            const compressed = await compressImage(previewImg.src, 0.55);
+            localStorage.setItem(STORAGE_KEY_PHOTO, compressed);
+          } catch (e2) {
+            console.error("Save failed:", e2);
+            showToast("Gagal menyimpan foto. Coba lagi.", 3500);
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = originalLabel;
+            return;
+          }
+        }
+        
+        const finalPhoto = localStorage.getItem(STORAGE_KEY_PHOTO);
+        showSavedScreen(name, finalPhoto);
+        showToast("Foto kartu berhasil disimpan permanen ✓", 3000);
       });
 
+      // Helper: kompres gambar jika quota storage penuh
+      function compressImage(src, quality) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const c = document.createElement("canvas");
+            const maxDim = 1000;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              const ratio = Math.min(maxDim / w, maxDim / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+            c.width = w;
+            c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            try {
+              resolve(c.toDataURL("image/jpeg", quality));
+            } catch (e) {
+              reject(e);
+            }
+          };
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      /* ========== CLEANUP ========== */
       closeCameraBtn.addEventListener("click", closeCamera);
-      btnAmbil.addEventListener("click", openCamera);
       window.addEventListener("pagehide", stopStream);
     });
   </script>
